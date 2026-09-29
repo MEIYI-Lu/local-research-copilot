@@ -1,7 +1,30 @@
-{"question":"Why might hybrid retrieval be better than BM25 alone?","relevant_doc_ids":["hybrid_retrieval"]}
-{"question":"What is Reciprocal Rank Fusion used for?","relevant_doc_ids":["hybrid_retrieval"]}
-{"question":"How are dense vectors stored locally?","relevant_doc_ids":["chromadb"]}
-{"question":"What happens when the evidence is weak?","relevant_doc_ids":["agent_workflow"]}
-{"question":"How does the system handle prompt injection inside retrieved documents?","relevant_doc_ids":["rag_safety"]}
-{"question":"Which metrics evaluate retrieval quality?","relevant_doc_ids":["evaluation"]}
-{"question":"Why can RAG reduce hallucination?","relevant_doc_ids":["rag_fundamentals"]}
+{"question": "What does the BM25 k1 parameter control?", "relevant_doc_ids": ["bm25_scoring"], "query_type": "lexical"}
+{"question": "What is HNSW efSearch?", "relevant_doc_ids": ["hnsw_search"], "query_type": "lexical"}
+{"question": "What does SQLite WAL stand for and what does it change?", "relevant_doc_ids": ["sqlite_wal"], "query_type": "lexical"}
+{"question": "What is MVCC?", "relevant_doc_ids": ["mvcc"], "query_type": "lexical"}
+{"question": "What is an ETag used for in HTTP caching?", "relevant_doc_ids": ["http_caching"], "query_type": "lexical"}
+{"question": "What makes an operation idempotent?", "relevant_doc_ids": ["idempotency"], "query_type": "lexical"}
+{"question": "What does a JWT signature protect?", "relevant_doc_ids": ["jwt_authentication"], "query_type": "lexical"}
+{"question": "What does a CSRF token protect against?", "relevant_doc_ids": ["csrf_protection"], "query_type": "lexical"}
+{"question": "What is Reciprocal Rank Fusion?", "relevant_doc_ids": ["hybrid_retrieval"], "query_type": "lexical"}
+{"question": "What does MRR measure in retrieval evaluation?", "relevant_doc_ids": ["evaluation"], "query_type": "lexical"}
+{"question": "How can search find the right passage when the query uses different wording from the document?", "relevant_doc_ids": ["dense_embeddings"], "query_type": "semantic"}
+{"question": "How do you stop a fast producer from overwhelming a slower downstream consumer?", "relevant_doc_ids": ["backpressure"], "query_type": "semantic"}
+{"question": "How can a team deploy unfinished code but expose it only to a small cohort?", "relevant_doc_ids": ["feature_flags"], "query_type": "semantic"}
+{"question": "How can a server avoid sending the full response when the client already has the current version?", "relevant_doc_ids": ["http_caching"], "query_type": "semantic"}
+{"question": "How can readers see a consistent database snapshot without directly blocking writers?", "relevant_doc_ids": ["mvcc"], "query_type": "semantic"}
+{"question": "How can retrying the same payment request avoid charging a customer twice?", "relevant_doc_ids": ["idempotency"], "query_type": "semantic"}
+{"question": "How should a long document be divided into overlapping retrievable pieces?", "relevant_doc_ids": ["chunking_strategy"], "query_type": "semantic"}
+{"question": "How can a stronger model reorder candidates after a fast first-stage search?", "relevant_doc_ids": ["reranking"], "query_type": "semantic"}
+{"question": "How should a RAG system react when a retrieved document contains instructions for the model?", "relevant_doc_ids": ["rag_safety"], "query_type": "semantic"}
+{"question": "Why should retrieval quality be measured separately from how fluent the final answer sounds?", "relevant_doc_ids": ["evaluation"], "query_type": "semantic"}
+{"question": "How can a search system combine exact keyword matching with meaning-based retrieval?", "relevant_doc_ids": ["bm25_scoring", "dense_embeddings", "hybrid_retrieval"], "query_type": "multi_evidence"}
+{"question": "What parts of a RAG system help reduce unsupported or hallucinated claims?", "relevant_doc_ids": ["rag_fundamentals", "citation_grounding", "agent_workflow"], "query_type": "multi_evidence"}
+{"question": "How can approximate vector search stay fast while preserving useful similarity quality?", "relevant_doc_ids": ["hnsw_search", "vector_normalization", "dense_embeddings"], "query_type": "multi_evidence"}
+{"question": "What should an evidence-aware assistant do when retrieved context is weak or malicious?", "relevant_doc_ids": ["agent_workflow", "rag_safety"], "query_type": "multi_evidence"}
+{"question": "What techniques make an API safer under retries and sudden traffic pressure?", "relevant_doc_ids": ["idempotency", "rate_limiting", "backpressure"], "query_type": "multi_evidence"}
+{"question": "What mechanisms help a web application prevent forged browser requests and verify signed identity claims?", "relevant_doc_ids": ["csrf_protection", "jwt_authentication"], "query_type": "multi_evidence"}
+{"question": "How can a database balance concurrent access, atomic updates, and durable local writes?", "relevant_doc_ids": ["database_transactions", "mvcc", "sqlite_wal"], "query_type": "multi_evidence"}
+{"question": "How can retrieval results be measured and then improved with a stronger second-stage ranking model?", "relevant_doc_ids": ["evaluation", "reranking"], "query_type": "multi_evidence"}
+{"question": "What metadata should be preserved so an answer can point back to the exact source passage?", "relevant_doc_ids": ["citation_grounding", "chromadb", "chunking_strategy"], "query_type": "multi_evidence"}
+{"question": "How do vector normalization and cosine similarity fit into dense retrieval and vector storage?", "relevant_doc_ids": ["vector_normalization", "dense_embeddings", "chromadb"], "query_type": "multi_evidence"}

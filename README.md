@@ -2,21 +2,41 @@
 
 [![Tests](https://github.com/MEIYI-Lu/local-research-copilot/actions/workflows/tests.yml/badge.svg)](https://github.com/MEIYI-Lu/local-research-copilot/actions/workflows/tests.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
+![Version](https://img.shields.io/badge/version-0.3.0-informational)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 A local-first research assistant that combines **BM25 lexical retrieval**, **dense embeddings**, **ChromaDB**, and **Reciprocal Rank Fusion (RRF)** with a small **LangGraph agent** that checks evidence before deciding whether to answer, retry retrieval, or refuse.
 
-The project is designed as a reproducible portfolio implementation rather than a single-notebook RAG demo. It includes a command-line interface, Streamlit web app, retrieval benchmarking, tests, CI, prompt-injection checks, citation grounding, and a zero-API extractive fallback.
+The repository is designed as a reproducible portfolio project rather than a single-notebook demo. It includes a CLI, Streamlit web app, labelled retrieval benchmarks, prompt-injection filtering, citation grounding, tests, CI, and a zero-API extractive fallback.
 
 ## Demo
 
-The agent refuses to answer when the indexed evidence is too weak instead of guessing:
+The Streamlit interface exposes the knowledge-base size, example questions, confidence, routing decisions, and retrieved evidence:
+
+![Web app](assets/demo-ui-v0.2.png)
+
+*UI smoke-test screenshot from the v0.2 six-document corpus; the v0.3 sample corpus contains 24 documents.*
+
+A deliberately out-of-domain question is refused instead of answered from unrelated model knowledge:
 
 ![Refusal demo](assets/demo-refusal.png)
 
+## What changed in v0.3
+
+The evaluation layer is now less toy-like and more diagnostic:
+
+- sample corpus expanded from **6 to 24 documents**;
+- evaluation set expanded from **7 to 30 labelled questions**;
+- questions are split into **lexical**, **semantic**, and **multi-evidence** groups;
+- multi-evidence questions can have two or three relevant documents, making Precision@K more informative;
+- CLI evaluation now reports both **overall** and **per-query-type** results;
+- the original v0.2 benchmark is preserved for reproducibility.
+
+No v0.3 benchmark numbers are hard-coded into the README. Run the benchmark on the current environment and report the actual results.
+
 ## Why this project exists
 
-Many RAG examples stop at “embed documents and ask a question.” This project focuses on the engineering decisions that make retrieval behavior easier to inspect and evaluate:
+Many RAG examples stop at “embed documents and ask a question.” This project focuses on engineering choices that make retrieval behaviour easier to inspect and evaluate:
 
 - lexical + semantic retrieval instead of relying on one retriever;
 - RRF to fuse rankings without comparing incompatible raw scores;
@@ -26,7 +46,7 @@ Many RAG examples stop at “embed documents and ask a question.” This project
 - grounded answers with chunk-level citations;
 - refusal when evidence remains weak;
 - prompt-injection checks on both user input and retrieved evidence;
-- reproducible BM25 vs dense vs hybrid retrieval metrics;
+- reproducible BM25 vs dense vs hybrid evaluation;
 - automated tests and GitHub Actions.
 
 ## Architecture
@@ -58,7 +78,7 @@ flowchart LR
 
 ### What makes the workflow agentic?
 
-The system does more than call a retriever once. The LangGraph state records the current query, retrieved evidence, confidence, retry count, route, answer, and citations. Based on that state, it selects the next action:
+The LangGraph state records the current query, retrieved evidence, confidence, retry count, route, answer, and citations. The next action depends on that state:
 
 ```text
 question
@@ -74,13 +94,13 @@ assess evidence
         └── after retry ───→ refuse
 ```
 
-The default non-LLM mode still performs a deterministic keyword rewrite, so the retry branch is real rather than simply repeating the identical query.
+The default non-LLM mode performs a deterministic keyword rewrite, so the retry branch is real even when Ollama is not configured.
 
 ## Features
 
 - **Document ingestion:** Markdown, plain text, and PDF.
 - **Chunking:** configurable word chunks with overlap and preserved source metadata.
-- **BM25 retrieval:** lexical baseline for exact terms and identifiers.
+- **BM25 retrieval:** lexical baseline for exact terms, identifiers, and rare vocabulary.
 - **Dense retrieval:** `sentence-transformers/all-MiniLM-L6-v2`.
 - **Vector store:** persistent ChromaDB collection.
 - **Hybrid retrieval:** Reciprocal Rank Fusion across BM25 and dense rankings.
@@ -88,8 +108,8 @@ The default non-LLM mode still performs a deterministic keyword rewrite, so the 
 - **Prompt-injection filtering:** suspicious input and retrieved chunks are treated as untrusted.
 - **Grounded fallback:** focused extractive answers work without a paid API or local LLM.
 - **Optional local generation:** Ollama can generate more natural answers while remaining evidence-grounded.
-- **Evaluation:** BM25, dense, and hybrid retrieval are compared using Precision@K, Recall@K, Hit@K, and MRR.
-- **Demo UI:** Streamlit chat interface with example questions, confidence display, conversation history, and evidence scores.
+- **Evaluation:** overall and grouped Precision@K, Recall@K, Hit@K, and MRR.
+- **Demo UI:** Streamlit chat interface with examples, confidence, history, and evidence scores.
 - **CI:** lightweight tests on every push and pull request.
 
 ## Project structure
@@ -97,29 +117,31 @@ The default non-LLM mode still performs a deterministic keyword rewrite, so the 
 ```text
 local-research-copilot/
 ├── .github/
-│   └── workflows/
-│       └── tests.yml
+│   └── workflows/tests.yml
 ├── assets/
-│   └── demo-refusal.png
+│   ├── benchmark-v0.2.png
+│   ├── demo-refusal.png
+│   └── demo-ui-v0.2.png
 ├── data/
 │   ├── eval/
-│   │   └── questions.jsonl
-│   └── sample_docs/
-├── src/
-│   └── copilot/
-│       ├── retrieval/
-│       │   ├── bm25.py
-│       │   ├── chroma.py
-│       │   └── hybrid.py
-│       ├── agent.py
-│       ├── cli.py
-│       ├── config.py
-│       ├── evaluation.py
-│       ├── guardrails.py
-│       ├── ingest.py
-│       ├── knowledge_base.py
-│       ├── llm.py
-│       └── models.py
+│   │   ├── README.md
+│   │   ├── questions.jsonl          # v0.3: 30 questions
+│   │   └── questions_v0_2.jsonl     # preserved 7-question baseline
+│   └── sample_docs/                 # v0.3: 24 documents
+├── src/copilot/
+│   ├── retrieval/
+│   │   ├── bm25.py
+│   │   ├── chroma.py
+│   │   └── hybrid.py
+│   ├── agent.py
+│   ├── cli.py
+│   ├── config.py
+│   ├── evaluation.py
+│   ├── guardrails.py
+│   ├── ingest.py
+│   ├── knowledge_base.py
+│   ├── llm.py
+│   └── models.py
 ├── tests/
 ├── streamlit_app.py
 ├── pyproject.toml
@@ -158,7 +180,7 @@ pip install -e .
 pytest -q
 ```
 
-### 4. Build the sample knowledge base
+### 4. Build the v0.3 sample knowledge base
 
 ```bash
 research-copilot index data/sample_docs
@@ -169,7 +191,7 @@ The first run downloads `all-MiniLM-L6-v2` from Hugging Face.
 ### 5. Ask a question
 
 ```bash
-research-copilot ask "What is Reciprocal Rank Fusion?"
+research-copilot ask "How does backpressure protect a slow consumer?"
 ```
 
 ### 6. Launch the web app
@@ -194,40 +216,63 @@ streamlit run streamlit_app.py --server.address 0.0.0.0 --server.port 8501
 
 When Codespaces detects port `8501`, choose **Open in Browser**.
 
-If disk space is tight, inspect it with:
+If disk space is tight:
 
 ```bash
 df -h
-```
-
-and clear the pip cache if necessary:
-
-```bash
 python -m pip cache purge
 ```
 
-## Retrieval benchmark
+## Retrieval evaluation
 
-The included labelled question set can be used to compare all three retrievers on exactly the same queries:
+### v0.3 expanded benchmark
+
+The current benchmark contains **30 questions** over **24 documents**. It deliberately mixes three retrieval situations:
+
+- **lexical (10):** exact technical terms, acronyms, and identifiers;
+- **semantic (10):** paraphrased intent with less direct token overlap;
+- **multi_evidence (10):** two or three labelled relevant documents.
+
+Run:
 
 ```bash
 research-copilot eval data/eval/questions.jsonl --k 3
 ```
 
-The command prints a comparison table for:
+The CLI prints an overall comparison and then a separate table for each query type. Use `--overall-only` if only the aggregate table is needed:
+
+```bash
+research-copilot eval data/eval/questions.jsonl --k 3 --overall-only
+```
+
+The compared retrievers are:
 
 - **BM25**
 - **Dense retrieval**
 - **Hybrid RRF**
 
-using:
+Metrics:
 
-- **Precision@K:** proportion of the top-K retrieved documents that are relevant;
-- **Recall@K:** proportion of known relevant documents that were retrieved;
+- **Precision@K:** proportion of top-K retrieved documents that are relevant;
+- **Recall@K:** proportion of labelled relevant documents retrieved;
 - **Hit@K:** whether at least one relevant document appears in the top K;
 - **MRR:** reciprocal rank of the first relevant result.
 
-Keeping retrieval evaluation separate from answer fluency makes it possible to tell whether an improvement actually comes from better retrieval rather than nicer wording.
+The expanded set is intended to reveal different strengths rather than force Hybrid RRF to “win.” A credible benchmark reports what the system actually does.
+
+### Preserved v0.2 sanity check
+
+The original six-document, seven-question benchmark is retained at `data/eval/questions_v0_2.jsonl`. The measured result from that version was:
+
+| Retriever | Precision@3 | Recall@3 | Hit@3 | MRR |
+|---|---:|---:|---:|---:|
+| BM25 | 0.3333 | 1.0000 | 1.0000 | 0.9286 |
+| Dense | 0.3333 | 1.0000 | 1.0000 | **1.0000** |
+| Hybrid RRF | 0.3333 | 1.0000 | 1.0000 | 0.9286 |
+
+All three retrievers found the relevant document in the top three on that small sanity check. Dense retrieval ranked the relevant document first for every query. This is intentionally reported as a small-sample result, not as a general claim that one retriever is universally superior.
+
+![v0.2 retrieval benchmark](assets/benchmark-v0.2.png)
 
 ## Default extractive mode
 
@@ -237,7 +282,7 @@ The default configuration does **not** require an API key or local generative mo
 COPILOT_LLM_PROVIDER=extractive
 ```
 
-The system selects question-relevant sentences from retrieved evidence, removes Markdown headings, and attaches chunk citations. This makes the repository runnable on a clean machine before an LLM is configured.
+The system selects question-relevant sentences from retrieved evidence, removes Markdown headings, and attaches chunk citations. This makes the repository runnable before an LLM is configured.
 
 ## Optional Ollama generation
 
@@ -263,13 +308,7 @@ $env:COPILOT_LLM_PROVIDER="ollama"
 $env:COPILOT_OLLAMA_MODEL="qwen2.5:7b"
 ```
 
-Then ask normally:
-
-```bash
-research-copilot ask "How does the system reduce hallucination risk?"
-```
-
-If Ollama is unavailable, answer generation falls back to the grounded extractive mode.
+If Ollama is unavailable, generation falls back to grounded extractive mode.
 
 ## Safety and robustness
 
@@ -277,9 +316,9 @@ Retrieved documents are treated as **untrusted evidence, not instructions**. The
 
 The guardrail is intentionally simple and explainable. It is not a production security boundary. A production deployment should add stronger content isolation, provenance checks, least-privilege tool permissions, observability, and adversarial testing.
 
-## Example behaviors
+## Example behaviours
 
-A question supported by the sample knowledge base should route to `answer` with citations:
+Supported question:
 
 ```text
 What is Reciprocal Rank Fusion?
@@ -289,7 +328,7 @@ What is Reciprocal Rank Fusion?
 → answer + citations
 ```
 
-A question outside the knowledge base should have low evidence confidence and route to `refuse` rather than relying on unrelated model knowledge:
+Out-of-domain question:
 
 ```text
 What is the capital of Brazil?
@@ -309,13 +348,13 @@ This repository demonstrates practical work with:
 - LangGraph state and conditional routing;
 - grounded answer generation and citations;
 - prompt-injection defence;
-- retrieval evaluation and reproducibility;
+- benchmark design and grouped evaluation;
 - Streamlit application development;
 - modular Python packaging, testing, and CI.
 
 ## Academic integrity
 
-This is a standalone portfolio implementation. If techniques learned in university coursework are reused, the implementation and documentation should remain original, and course-provided assessment materials, hidden tests, datasets with restricted distribution, or submitted assessment solutions should not be published here.
+This is a standalone portfolio implementation. If techniques learned in university coursework are reused, the implementation and documentation should remain original, and course-provided assessment materials, hidden tests, restricted datasets, or submitted assessment solutions should not be published here.
 
 ## License
 

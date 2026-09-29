@@ -1,0 +1,7 @@
+{"question":"Why might hybrid retrieval be better than BM25 alone?","relevant_doc_ids":["hybrid_retrieval"]}
+{"question":"What is Reciprocal Rank Fusion used for?","relevant_doc_ids":["hybrid_retrieval"]}
+{"question":"How are dense vectors stored locally?","relevant_doc_ids":["chromadb"]}
+{"question":"What happens when the evidence is weak?","relevant_doc_ids":["agent_workflow"]}
+{"question":"How does the system handle prompt injection inside retrieved documents?","relevant_doc_ids":["rag_safety"]}
+{"question":"Which metrics evaluate retrieval quality?","relevant_doc_ids":["evaluation"]}
+{"question":"Why can RAG reduce hallucination?","relevant_doc_ids":["rag_fundamentals"]}

@@ -12,7 +12,7 @@ index:
 	research-copilot index data/sample_docs
 
 ask:
-	research-copilot ask "Why can hybrid retrieval outperform BM25 alone?"
+	research-copilot ask "How can search combine exact terms with semantic similarity?"
 
 eval:
 	research-copilot eval data/eval/questions.jsonl --k 3

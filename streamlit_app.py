@@ -40,7 +40,7 @@ with st.sidebar:
 st.markdown("**Try an example**")
 examples = [
     "What is Reciprocal Rank Fusion?",
-    "How does the system handle prompt injection?",
+    "How does backpressure protect a slow consumer?",
     "What is the capital of Brazil?",
 ]
 columns = st.columns(3)
