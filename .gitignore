@@ -6,3 +6,5 @@ __pycache__/
 .env
 index/
 .DS_Store
+.streamlit/secrets.toml
+*.log

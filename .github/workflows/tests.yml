@@ -12,10 +12,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Install test dependencies
+      - name: Install lightweight test dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install rank-bm25 pypdf pytest
+          pip install pypdf pytest requests
           pip install -e . --no-deps
       - name: Run lightweight tests
         run: pytest -q

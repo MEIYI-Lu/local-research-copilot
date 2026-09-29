@@ -61,13 +61,32 @@ class KnowledgeBase:
             self.settings.embedding_model,
         )
 
-    def search(self, query: str, k: int | None = None) -> list[RetrievalHit]:
+    def _ensure_loaded(self) -> None:
         if self.bm25 is None or self.chroma is None:
             self.load()
+
+    def search_bm25(self, query: str, k: int | None = None) -> list[RetrievalHit]:
+        self._ensure_loaded()
+        return self.bm25.retrieve(query, k=k or self.settings.final_k)  # type: ignore[union-attr]
+
+    def search_dense(self, query: str, k: int | None = None) -> list[RetrievalHit]:
+        self._ensure_loaded()
+        return self.chroma.retrieve(  # type: ignore[union-attr]
+            query,
+            self.lookup,
+            k=k or self.settings.final_k,
+        )
+
+    def search(self, query: str, k: int | None = None) -> list[RetrievalHit]:
+        self._ensure_loaded()
         final_k = k or self.settings.final_k
-        bm25_hits = self.bm25.retrieve(query, k=self.settings.retrieve_k_each)  # type: ignore[union-attr]
+        bm25_hits = self.bm25.retrieve(  # type: ignore[union-attr]
+            query, k=self.settings.retrieve_k_each
+        )
         dense_hits = self.chroma.retrieve(  # type: ignore[union-attr]
-            query, self.lookup, k=self.settings.retrieve_k_each
+            query,
+            self.lookup,
+            k=self.settings.retrieve_k_each,
         )
         return reciprocal_rank_fusion(
             bm25_hits,

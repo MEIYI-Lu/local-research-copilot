@@ -3,8 +3,8 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rag-agent-research-copilot"
-version = "0.1.0"
+name = "local-research-copilot"
+version = "0.2.0"
 description = "Local hybrid RAG + LangGraph research assistant with evaluation and guardrails"
 readme = "README.md"
 requires-python = ">=3.10"

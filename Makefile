@@ -1,8 +1,12 @@
-.PHONY: install index ask eval test ui
+.PHONY: install codespaces-install index ask eval test ui
 
 install:
 	pip install -r requirements.txt
 	pip install -e .
+
+codespaces-install:
+	pip install --no-cache-dir -r requirements.txt
+	pip install -e . --no-deps
 
 index:
 	research-copilot index data/sample_docs

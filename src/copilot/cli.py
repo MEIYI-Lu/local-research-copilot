@@ -8,7 +8,7 @@ from rich.table import Table
 
 from .agent import ResearchAgent
 from .config import Settings
-from .evaluation import evaluate_file
+from .evaluation import evaluate_comparison
 from .knowledge_base import KnowledgeBase
 
 
@@ -50,13 +50,23 @@ def eval_command(
     settings = Settings()
     kb = KnowledgeBase(settings)
     kb.load()
-    results = evaluate_file(kb, questions, k=k)
+    results = evaluate_comparison(kb, questions, k=k)
 
-    table = Table(title=f"Retrieval evaluation @ {k}")
-    table.add_column("Metric")
-    table.add_column("Score", justify="right")
-    for key, value in results.items():
-        table.add_row(key, f"{value:.4f}")
+    table = Table(title=f"Retrieval benchmark @ {k}")
+    table.add_column("Retriever")
+    table.add_column(f"Precision@{k}", justify="right")
+    table.add_column(f"Recall@{k}", justify="right")
+    table.add_column(f"Hit@{k}", justify="right")
+    table.add_column("MRR", justify="right")
+
+    for retriever, metrics in results.items():
+        table.add_row(
+            retriever,
+            f"{metrics['precision@k']:.4f}",
+            f"{metrics['recall@k']:.4f}",
+            f"{metrics['hit@k']:.4f}",
+            f"{metrics['mrr']:.4f}",
+        )
     console.print(table)
 
 
