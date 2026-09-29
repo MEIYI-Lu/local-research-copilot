@@ -2,7 +2,7 @@
 
 [![Tests](https://github.com/MEIYI-Lu/local-research-copilot/actions/workflows/tests.yml/badge.svg)](https://github.com/MEIYI-Lu/local-research-copilot/actions/workflows/tests.yml)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Version](https://img.shields.io/badge/version-0.3.0-informational)
+![Version](https://img.shields.io/badge/version-0.3.1-informational)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 A local-first research assistant that combines **BM25 lexical retrieval**, **dense embeddings**, **ChromaDB**, and **Reciprocal Rank Fusion (RRF)** with a small **LangGraph agent** that checks evidence before deciding whether to answer, retry retrieval, or refuse.
@@ -21,18 +21,17 @@ A deliberately out-of-domain question is refused instead of answered from unrela
 
 ![Refusal demo](assets/demo-refusal.png)
 
-## What changed in v0.3
+## What changed in v0.3.1
 
-The evaluation layer is now less toy-like and more diagnostic:
+The evaluation layer is now less toy-like and more diagnostic, and the measured v0.3 benchmark is documented below:
 
 - sample corpus expanded from **6 to 24 documents**;
 - evaluation set expanded from **7 to 30 labelled questions**;
 - questions are split into **lexical**, **semantic**, and **multi-evidence** groups;
 - multi-evidence questions can have two or three relevant documents, making Precision@K more informative;
 - CLI evaluation now reports both **overall** and **per-query-type** results;
-- the original v0.2 benchmark is preserved for reproducibility.
-
-No v0.3 benchmark numbers are hard-coded into the README. Run the benchmark on the current environment and report the actual results.
+- the original v0.2 benchmark is preserved for reproducibility;
+- the measured 30-query benchmark is now documented in the README.
 
 ## Why this project exists
 
@@ -259,6 +258,36 @@ Metrics:
 - **MRR:** reciprocal rank of the first relevant result.
 
 The expanded set is intended to reveal different strengths rather than force Hybrid RRF to “win.” A credible benchmark reports what the system actually does.
+
+### Measured v0.3 results
+
+The following results were measured with the included **24-document corpus**, **30 labelled queries**, and `k=3`:
+
+| Retriever | Precision@3 | Recall@3 | Hit@3 | MRR |
+|---|---:|---:|---:|---:|
+| BM25 | 0.4333 | 0.8833 | 0.9667 | 0.9333 |
+| Dense | **0.4667** | **0.9444** | **1.0000** | 0.9500 |
+| Hybrid RRF | **0.4667** | **0.9444** | **1.0000** | **0.9833** |
+
+The aggregate result shows that Dense and Hybrid RRF retrieved more of the labelled relevant evidence than BM25, while Hybrid RRF achieved the strongest overall ranking quality by MRR.
+
+Per query type:
+
+| Query type | Retriever | Precision@3 | Recall@3 | Hit@3 | MRR |
+|---|---|---:|---:|---:|---:|
+| Lexical | BM25 | 0.3333 | 1.0000 | 1.0000 | 1.0000 |
+| Lexical | Dense | 0.3333 | 1.0000 | 1.0000 | 1.0000 |
+| Lexical | Hybrid RRF | 0.3333 | 1.0000 | 1.0000 | 1.0000 |
+| Multi-evidence | BM25 | 0.6667 | 0.7500 | 1.0000 | 0.9500 |
+| Multi-evidence | Dense | **0.7333** | **0.8333** | 1.0000 | **1.0000** |
+| Multi-evidence | Hybrid RRF | **0.7333** | **0.8333** | 1.0000 | **1.0000** |
+| Semantic | BM25 | 0.3000 | 0.9000 | 0.9000 | 0.8500 |
+| Semantic | Dense | **0.3333** | **1.0000** | **1.0000** | 0.8500 |
+| Semantic | Hybrid RRF | **0.3333** | **1.0000** | **1.0000** | **0.9500** |
+
+The grouped results are useful because they show *where* the methods differ. Exact-term lexical questions were easy for all three retrievers. Dense retrieval improved coverage on semantic and multi-evidence questions. Hybrid RRF preserved that coverage while improving the ranking of the first relevant result on semantic questions, producing the highest overall MRR.
+
+These are small, project-specific benchmark results rather than a claim that Hybrid RRF is universally superior. The purpose is reproducibility and diagnosis of retrieval behaviour on the included corpus.
 
 ### Preserved v0.2 sanity check
 
